@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up GitHub CLI
-        uses: cli/cli-action@v2
+        uses: cli/gh-action@v2
 
       - name: Check if PR is self-approved
         env:
