@@ -1,0 +1,25 @@
+name: Prevent Self-Merges
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  check-author-vs-merger:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Check if PR was merged by its author
+        run: |
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          MERGER="${{ github.event.pull_request.merged_by.login }}"
+
+          echo "PR Author: $AUTHOR"
+          echo "PR Merged By: $MERGER"
+
+          if [ "$AUTHOR" = "$MERGER" ]; then
+            echo "This PR was merged by its author, which is not allowed."
+            exit 1
+          else
+            echo "This PR was merged by someone other than the author."
+          fi
