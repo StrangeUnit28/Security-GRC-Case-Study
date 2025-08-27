@@ -5,7 +5,8 @@ from checks_prs import get_pr_approval_status
 from fpdf import FPDF
 
 
-def generate_report(compliant, violations):
+
+def generate_report(compliant, violations, pdf_path='pr_compliance_report.pdf'):
     total = len(compliant) + len(violations)
     percent_compliant = (len(compliant) / total * 100) if total else 0
     percent_violations = (len(violations) / total * 100) if total else 0
@@ -48,8 +49,9 @@ def generate_report(compliant, violations):
             pdf.multi_cell(0, 8, f"PR #{pr['number']} ({pr['title']}) by {pr['user']['login']} merged at {pr['merged_at']}")
     else:
         pdf.cell(0, 8, 'None', ln=True)
-    pdf.output('pr_compliance_report.pdf')
-    print('Report generated: pr_compliance_report.pdf')
+    pdf.output(pdf_path)
+    print(f'Report generated: {pdf_path}')
+    return pdf_path
 
 if __name__ == "__main__":
     compliant, violations = get_pr_approval_status()
