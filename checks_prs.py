@@ -31,6 +31,26 @@ def get_reviews(pr_number):
     return resp.json()
 
 
+def get_pr_approval_status():
+    """Return (compliant, violations) lists for merged PRs."""
+    merged_prs = get_merged_prs()
+    violations = []
+    compliant = []
+    for pr in merged_prs:
+        pr_number = pr["number"]
+        author = pr["user"]["login"]
+        reviews = get_reviews(pr_number)
+        approvals = [
+            r for r in reviews
+            if r["state"].upper() == "APPROVED" and r["user"]["login"] != author
+        ]
+        if not approvals:
+            violations.append(pr)
+        else:
+            compliant.append(pr)
+    return compliant, violations
+
+
 def check_prs():
     """Check if merged PRs were self-approved only."""
     merged_prs = get_merged_prs()
