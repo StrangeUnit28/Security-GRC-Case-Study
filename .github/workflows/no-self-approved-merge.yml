@@ -2,15 +2,14 @@ name: Prevent Self-Approved Merges
 
 on:
   pull_request:
-    types: [synchronize, ready_for_review, review_requested, opened, reopened]
+    types: [opened, reopened, synchronize, ready_for_review, review_requested]
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   check-author-vs-approver:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up GitHub CLI
-        uses: cli/cli-action@v2
-
       - name: Check if PR is self-approved
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,12 +21,11 @@ jobs:
           echo "PR Author: $AUTHOR"
           echo "PR Number: $PR_NUMBER"
 
-          # Get all reviews for the PR
+          # Get all reviews for the PR (GH CLI is already available on runner)
           APPROVERS=$(gh api repos/$REPO/pulls/$PR_NUMBER/reviews --jq '.[] | select(.state=="APPROVED") | .user.login' | sort | uniq)
 
           echo "Approvers: $APPROVERS"
 
-          # Check if there is at least one approval from someone other than the author
           APPROVED_BY_OTHERS=false
           for user in $APPROVERS; do
             if [ "$user" != "$AUTHOR" ]; then
