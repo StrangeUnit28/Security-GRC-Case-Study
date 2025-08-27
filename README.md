@@ -157,6 +157,7 @@ Together, they evolve Erambot from a rule-based script into an intelligent compl
 
 The video explains the project, its structure, and the reasoning behind each implementation decision.
 
+[Click here for the video](https://drive.google.com/file/d/1OS-kvQyDc8b-ZMXx6rpSy-db8ZST3MGl/view?usp=sharing)
 
 ## Improvements
 
