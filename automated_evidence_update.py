@@ -7,6 +7,7 @@ from control_verification.checks_prs import get_pr_approval_status
 from control_verification.pr_compliance_report import generate_report
 
 
+
 class ErambotEvidenceUploader:
     def __init__(self, base_url: str, api_token: str):
         self.base_url = base_url.rstrip("/")
@@ -15,15 +16,20 @@ class ErambotEvidenceUploader:
             "Authorization": f"Bearer {api_token}"
         })
 
+    def _base_payload(self):
+        return {
+            "timestamp": datetime.datetime.now().isoformat() + "Z",
+            "source": "Erambot"
+        }
+
     def submit_evidence(self, control_id: str, evidence_data: dict) -> dict:
         url = f"{self.base_url}/api/controls/{control_id}/evidences"
-        payload = {
-            "timestamp": datetime.datetime.now().isoformat() + "Z",
+        payload = self._base_payload()
+        payload.update({
             "evidence_type": evidence_data.get("type", "log"),
             "description": evidence_data.get("description", "Automated evidence upload"),
-            "source": evidence_data.get("source", "Erambot"),
             "content": evidence_data.get("content", {}),
-        }
+        })
         headers = {"Content-Type": "application/json"}
         response = self.session.post(url, data=json.dumps(payload), headers=headers)
         if response.status_code == 201:
@@ -37,12 +43,11 @@ class ErambotEvidenceUploader:
         files = {
             "file": (os.path.basename(pdf_path), open(pdf_path, "rb"), "application/pdf")
         }
-        data = {
-            "timestamp": datetime.datetime.now().isoformat() + "Z",
+        data = self._base_payload()
+        data.update({
             "evidence_type": "report",
-            "description": description,
-            "source": "Erambot"
-        }
+            "description": description
+        })
         response = self.session.post(url, data=data, files=files)
         if response.status_code == 201:
             print(f"PDF evidence submitted for control {control_id}")
@@ -53,9 +58,9 @@ class ErambotEvidenceUploader:
 
 if __name__ == "__main__":
     # Use environment variables or config for these
-    ERAMBA_URL = os.getenv("ERAMBA_URL", "https://eramba.company.com")
-    API_TOKEN = os.getenv("ERAMBA_API_TOKEN", "YOUR_ERAMBA_API_TOKEN")
-    CONTROL_ID = os.getenv("ERAMBA_CONTROL_ID", "CTRL-1234")
+    ERAMBA_URL = os.getenv("ERAMBA_URL")
+    API_TOKEN = os.getenv("ERAMBA_API_TOKEN")
+    CONTROL_ID = os.getenv("ERAMBA_CONTROL_ID")
 
     bot = ErambotEvidenceUploader(ERAMBA_URL, API_TOKEN)
 

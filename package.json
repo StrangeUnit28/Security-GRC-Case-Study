@@ -1,0 +1,17 @@
+{
+  "name": "control-verification",
+  "version": "1.0.0",
+  "description": "GitHub PR control verification using Octokit.js",
+  "main": "checks_prs.ts",
+  "scripts": {
+    "start": "ts-node control_verification/checks_prs.ts"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.0.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.0.0",
+    "typescript": "^5.0.0"
+  }
+}
